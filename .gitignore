@@ -1,0 +1,31 @@
+# Build directory
+build/
+
+# CMake artifacts
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+
+# Project metadata
+.idea/
+*.iml
+
+# Executables
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Ignore output if it's generated
+output/
