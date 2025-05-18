@@ -3,4 +3,6 @@ project(moving_average_cli)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(moving_average_cli main.cpp)
+add_executable(moving_average_cli src/main.cpp
+        include/ohlc_data.h
+)
