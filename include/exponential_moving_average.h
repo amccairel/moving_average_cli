@@ -4,6 +4,13 @@
 
 #ifndef EXPONENTIAL_MOVING_AVERAGE_H
 #define EXPONENTIAL_MOVING_AVERAGE_H
+#include "moving_average.h"
 
-class
+class ExponentialMovingAverage final : public MovingAverage {
+public:
+    ExponentialMovingAverage() = default;
+
+    [[nodiscard]]
+    std::map<std::string, double> calculate(const std::vector<OhlcData> &ohlc_data, size_t window) const override;
+};
 #endif //EXPONENTIAL_MOVING_AVERAGE_H

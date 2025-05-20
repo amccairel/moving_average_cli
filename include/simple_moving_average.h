@@ -4,12 +4,14 @@
 
 #ifndef SIMPLE_MOVING_AVERAGE_H
 #define SIMPLE_MOVING_AVERAGE_H
-#include "moving_average.h"
-#include <vector>
 
-class SimpleMovingAverage: public MovingAverage {
+#include "moving_average.h"
+
+class SimpleMovingAverage final : public MovingAverage {
 public:
-    explicit SimpleMovingAverage(const std::vector<double>& prices, const size_t& window): MovingAverage(prices, window) {};
-    std::vector<double> calculate() const override;
+    SimpleMovingAverage() = default;
+
+    [[nodiscard]]
+    std::map<std::string, double> calculate(const std::vector<OhlcData>& ohlc_data, size_t window) const override;
 };
 #endif //SIMPLE_MOVING_AVERAGE_H

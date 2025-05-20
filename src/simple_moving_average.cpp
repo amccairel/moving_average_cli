@@ -3,25 +3,31 @@
 //
 #include "../include/simple_moving_average.h"
 
-std::vector<double> SimpleMovingAverage::calculate() const {
-    std::vector<double> result;
-    if (window_ == 0 || values_.size() < window_)
-        return result;
+std::map<std::string, double> SimpleMovingAverage::calculate(const std::vector<OhlcData>& ohlc_data, size_t window) const {
+    std::map<std::string, double> average_map;
+    if (window == 0 || ohlc_data.size() < window) {
+        return average_map;
+    }
 
-    result.resize(values_.size(), NAN);  // pad with NaNs
+    // pad with NaNs
+    for (int i = 0; i < window - 1; ++i) {
+        const OhlcData& ohlc_entry = ohlc_data[i];
+        average_map[ohlc_entry.date] = NAN;
+    }
 
     double sum = 0.0;
-    for (size_t i = 0; i < values_.size(); ++i) {
-        sum += values_[i];
+    for (size_t i = 0; i < ohlc_data.size(); ++i) {
+        const OhlcData& ohlc_entry = ohlc_data[i];
+        sum += ohlc_entry.close;
 
-        if (i >= window_) {
-            sum -= values_[i - window_];
+        if (i >= window) {
+            sum -= ohlc_data[i - window].close;
         }
 
-        if (i >= window_ - 1) {
-            result[i] = sum / window_;
+        if (i >= window - 1) {
+            average_map[ohlc_entry.date] = sum / window;
         }
     }
 
-    return result;
+    return average_map;
 }

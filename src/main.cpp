@@ -2,16 +2,15 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include "../include/cxxopts.hpp"
 #include "../include/ohlc_data.h"
 #include "../include/simple_moving_average.h"
 
-int main(int argc, char const *argv[]) {
-    // TODO: change to command line argument
-    std::ifstream ifile("history.csv");
+// TODO: make reader writer
+std::vector<OhlcData> read_csv(const std::string& filename) {
+    std::ifstream ifile(filename);
     if (!ifile.is_open()) {
-        // TODO: print file too
-        std::cerr << "Error opening file." << std::endl;
-        return 1;
+        throw std::runtime_error("Error opening file: " + filename);
     }
 
     std::string line;
@@ -42,20 +41,44 @@ int main(int argc, char const *argv[]) {
 
     ifile.close();
 
-    for (const auto& ohlc_entry : ohlc_data) {
-        std::cout << ohlc_entry.date << " Open: " << ohlc_entry. open << " High: "<< ohlc_entry.high <<
-            " Low: " << ohlc_entry.low << " Close: " << ohlc_entry.close << " Volume: "<< ohlc_entry.volume << std::endl;
+    return ohlc_data;
+};
+
+int main(int argc, char const *argv[]) {
+    cxxopts::Options options("moving_average_cli","Moving Average CLI: Calculate moving averages from OHLC data and write to csv.");
+
+    options.add_options()
+       ("i,input", "Input CSV file", cxxopts::value<std::string>())
+       ("o,output", "Output CSV file", cxxopts::value<std::string>()->default_value("10_day_sma.csv"))
+       ("t,type", "Moving average type", cxxopts::value<std::string>()->default_value("SMA"))
+       ("w,window", "Window size", cxxopts::value<size_t>()->default_value("10"))
+       ("h,help", "Print help");
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        return 0;
     }
 
-    std::vector<double> close_prices;
-    close_prices.reserve(ohlc_data.size());
-    for (const auto& ohlc_entry : ohlc_data) {
-        close_prices.push_back(ohlc_entry.close);
+    std::string input = result["input"].as<std::string>();
+    std::string output = result["output"].as<std::string>();
+    std::string type = result["type"].as<std::string>();
+    size_t window = result["window"].as<size_t>();
+
+    std::vector<OhlcData> ohlc_data;
+    try {
+        ohlc_data = read_csv(input);
+    } catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
 
-    SimpleMovingAverage simple_moving_average(close_prices, 10);
-    for (std::vector<double> ten_day_averages = simple_moving_average.calculate(); const double& a: ten_day_averages) {
-        std::cout << "Ten day average: " << a << std::endl;
+    // TODO: make pointer to moving_average and based on cli moving avg "type" input, dynamically assign
+    SimpleMovingAverage simple_moving_average;
+    std::map<std::string, double> sma_map = simple_moving_average.calculate(ohlc_data, window);
+
+    for (const auto& [key, value]: sma_map) {
+        std::cout << key << ": " << value << std::endl;
     }
     return 0;
 }
