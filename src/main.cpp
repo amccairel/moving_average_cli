@@ -2,6 +2,9 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <memory>
+
+#include "exponential_moving_average.h"
 #include "../include/cxxopts.hpp"
 #include "../include/ohlc_data.h"
 #include "../include/simple_moving_average.h"
@@ -44,6 +47,20 @@ std::vector<OhlcData> read_csv(const std::string& filename) {
     return ohlc_data;
 };
 
+void write_csv(const std::map<std::string, double>& ma_map, const std::string& filename, const std::string& ma_type, int window) {
+    std::ofstream ofile(filename);
+    if (!ofile.is_open()) {
+        throw std::runtime_error("Error writing to file: " + filename);
+    }
+    ofile << window << " Day Moving Average" << std::endl;
+    ofile << "Date," << ma_type << std::endl;
+    for (const auto& [key, value]: ma_map) {
+        ofile << key << "," << value << std::endl;
+    }
+
+    ofile.close();
+}
+
 int main(int argc, char const *argv[]) {
     cxxopts::Options options("moving_average_cli","Moving Average CLI: Calculate moving averages from OHLC data and write to csv.");
 
@@ -51,10 +68,10 @@ int main(int argc, char const *argv[]) {
        ("i,input", "Input CSV file", cxxopts::value<std::string>())
        ("o,output", "Output CSV file", cxxopts::value<std::string>()->default_value("10_day_sma.csv"))
        ("t,type", "Moving average type", cxxopts::value<std::string>()->default_value("SMA"))
-       ("w,window", "Window size", cxxopts::value<size_t>()->default_value("10"))
+       ("w,window", "Window size", cxxopts::value<int>()->default_value("10"))
        ("h,help", "Print help");
 
-    auto result = options.parse(argc, argv);
+    const cxxopts::ParseResult result = options.parse(argc, argv);
 
     if (result.count("help")) {
         std::cout << options.help() << std::endl;
@@ -64,7 +81,7 @@ int main(int argc, char const *argv[]) {
     std::string input = result["input"].as<std::string>();
     std::string output = result["output"].as<std::string>();
     std::string type = result["type"].as<std::string>();
-    size_t window = result["window"].as<size_t>();
+    int window = result["window"].as<int>();
 
     std::vector<OhlcData> ohlc_data;
     try {
@@ -73,12 +90,19 @@ int main(int argc, char const *argv[]) {
         std::cout << e.what() << std::endl;
     }
 
-    // TODO: make pointer to moving_average and based on cli moving avg "type" input, dynamically assign
-    SimpleMovingAverage simple_moving_average;
-    std::map<std::string, double> sma_map = simple_moving_average.calculate(ohlc_data, window);
-
-    for (const auto& [key, value]: sma_map) {
-        std::cout << key << ": " << value << std::endl;
+    std::unique_ptr<MovingAverage> moving_average;
+    if (type == "SMA") {
+        moving_average = std::make_unique<SimpleMovingAverage>();
+    } else if (type == "EMA") {
+        moving_average = std::make_unique<ExponentialMovingAverage>();
+    } else {
+        std::cerr << "Unknown moving average type: " << type << std::endl;
+        return 1;
     }
+
+    const std::map<std::string, double> ma_map = moving_average -> calculate(ohlc_data, window);
+
+    write_csv(ma_map, output, type, window);
+
     return 0;
 }

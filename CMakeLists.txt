@@ -7,4 +7,5 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_executable(moving_average_cli src/main.cpp
         src/simple_moving_average.cpp
+        src/exponential_moving_average.cpp
 )

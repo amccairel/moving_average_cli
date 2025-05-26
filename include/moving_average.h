@@ -14,6 +14,6 @@ public:
     virtual ~MovingAverage() = default;
 
     [[nodiscard]]
-    virtual std::map<std::string, double> calculate(const std::vector<OhlcData>& ohlc_data, size_t window) const = 0;
+    virtual std::map<std::string, double> calculate(const std::vector<OhlcData>& ohlc_data, int window) const = 0;
 };
 #endif //MOVING_AVERAGE_H

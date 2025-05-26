@@ -12,6 +12,6 @@ public:
     SimpleMovingAverage() = default;
 
     [[nodiscard]]
-    std::map<std::string, double> calculate(const std::vector<OhlcData>& ohlc_data, size_t window) const override;
+    std::map<std::string, double> calculate(const std::vector<OhlcData>& ohlc_data, int window) const override;
 };
 #endif //SIMPLE_MOVING_AVERAGE_H
