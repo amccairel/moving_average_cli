@@ -52,7 +52,6 @@ void write_csv(const std::map<std::string, double>& ma_map, const std::string& f
     if (!ofile.is_open()) {
         throw std::runtime_error("Error writing to file: " + filename);
     }
-    ofile << window << " Day Moving Average" << std::endl;
     ofile << "Date," << ma_type << std::endl;
     for (const auto& [key, value]: ma_map) {
         ofile << key << "," << value << std::endl;
@@ -78,10 +77,10 @@ int main(int argc, char const *argv[]) {
         return 0;
     }
 
-    std::string input = result["input"].as<std::string>();
-    std::string output = result["output"].as<std::string>();
-    std::string type = result["type"].as<std::string>();
-    int window = result["window"].as<int>();
+    const std::string input = result["input"].as<std::string>();
+    const std::string output = result["output"].as<std::string>();
+    const std::string type = result["type"].as<std::string>();
+    const int window = result["window"].as<int>();
 
     std::vector<OhlcData> ohlc_data;
     try {
