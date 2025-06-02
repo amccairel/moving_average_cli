@@ -3,7 +3,7 @@
 //
 #include "../include/exponential_moving_average.h"
 
-std::map<std::string, double> ExponentialMovingAverage::calculate(const std::vector<OhlcData> &ohlc_data, int window) const {
+std::map<std::string, double> ExponentialMovingAverage::calculate(const std::vector<OhlcData> &ohlc_data, const int &window) const {
     std::map<std::string, double> ema_map;
     const double alpha = 2.0 / (window + 1);
 

@@ -3,7 +3,7 @@
 //
 #include "../include/simple_moving_average.h"
 
-std::map<std::string, double> SimpleMovingAverage::calculate(const std::vector<OhlcData>& ohlc_data, int window) const {
+std::map<std::string, double> SimpleMovingAverage::calculate(const std::vector<OhlcData>& ohlc_data, const int &window) const {
     std::map<std::string, double> average_map;
     if (window <= 0 || ohlc_data.empty()) {
         return average_map;

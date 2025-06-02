@@ -5,8 +5,6 @@
 #ifndef OHLC_DATA_H
 #define OHLC_DATA_H
 
-#include <chrono>
-
 struct OhlcData {
     std::string date;
     double open;

@@ -1,49 +1,60 @@
-# 📈 Moving Average CLI – Simple Moving Average Calculator in C++
+# Moving Average CLI
 
-This is a lightweight command-line application written in modern C++20 to calculate **Simple Moving Averages (SMA)** from OHLC (Open, High, Low, Close) data. The app reads a CSV file generated via [yfinance](https://github.com/ranaroussi/yfinance) and outputs an annotated CSV with SMA values, suitable for plotting or further analysis.
-
----
-
-## 🔧 Features
-
-- Reads historical stock price data from CSV
-- Computes n-day simple moving averages
-- Outputs a clean CSV with dates, close prices, and SMA values
-- Designed with modular, modern C++ (RAII, STL, separation of concerns)
-- Easily extendable for other indicators (EMA, RSI, MACD, etc.)
+A high-performance command-line application written in C++ for processing historical stock price data (Open High Low Close format) and computing various types of moving averages. Designed with modularity and extensibility in mind, this project supports flexible user input, multiple moving average types, and future enhancements like terminal indicators.
 
 ---
 
-## 📂 Project Structure
-moving-average-cli/
-├── include/ # Header files (interfaces)
-├── src/ # Source code
-├── output/ # Output with SMA annotations
-├── CMakeLists.txt # Build configuration
-└── README.md
+## 🚀 Features
+
+- ⚙️ **Flexible CLI Configuration**: Use `cxxopts` to specify input/output files, window sizes, and moving average types.
+- 📈 **Supports Multiple Moving Averages**:
+    - Simple Moving Average (SMA)
+    - Exponential Moving Average (EMA)
+    - Additional indicators in progress 
+- 🗃️ **Clean CSV I/O**: Read and write stock data in standard CSV format for easy interoperability.
+- 🧠 **Extensible Design**: Add new technical indicators with minimal changes to core logic.
+---
+
+## 🛠️ Tech Stack
+
+- **C++20**: Core language
+- **cxxopts**: Command-line argument parsing
+- **CMake**: Build system
+- **CSV**: Input/output format
 
 ---
 
-## 🚀 Getting Started
+## 📦 Usage
 
-### 🛠️ Requirements
-
-- C++20 compiler (GCC, Clang, MSVC)
-- CMake 3.10+
-
-### 📦 Build & Run
+### Compile the app:
 
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/moving_average_cli.git
-cd moving_average_cli
-
-# Create build directory
 mkdir build && cd build
 cmake ..
 make
+```
+### Run the CLI tool:
 
-# Run the app
-./moving_average_cli
+```bash
+./moving_average_cli --input path/to/stock-history.csv --output path/to/output.csv --type ema --window 12
 ```
 
+### Example Input (CSV)
+```csv
+Date,Open,High,Low,Close,Volume
+2024-01-01,100,105,95,102,1000000
+2024-01-02,102,107,98,104,1200000
+```
+
+### Example Output
+```csv
+Date,SMA
+2024-01-01,102
+2024-01-02,104
+```
+
+## Contributing
+Suggestions, pull requests, and bug reports are welcome.
+
+## License
+MIT License
