@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <memory>
+#include <ranges>
 
 #include "exponential_moving_average.h"
 #include "../include/cxxopts.hpp"
@@ -47,17 +48,27 @@ std::vector<OhlcData> read_csv(const std::string& filename) {
     return ohlc_data;
 };
 
-void write_csv(const std::map<std::string, double>& ma_map, const std::string& filename, const std::string& ma_type, int window) {
-    std::ofstream ofile(filename);
-    if (!ofile.is_open()) {
+void write_csv(const std::vector<std::string>& dates, const std::map<std::string, std::vector<double>>& ma_map, const std::string& filename) {
+    std::ofstream o_file(filename);
+    if (!o_file.is_open()) {
         throw std::runtime_error("Error writing to file: " + filename);
     }
-    ofile << "Date," << ma_type << std::endl;
-    for (const auto& [key, value]: ma_map) {
-        ofile << key << "," << value << std::endl;
+
+    o_file << "Date";
+    for (const std::string& ma_label: ma_map | std::views::keys) {
+        o_file << "," << ma_label;
+    }
+    o_file << std::endl;
+
+    for (int i = 0; i < dates.size(); i++) {
+        o_file << dates[i];
+        for (const std::vector<double>& averages: ma_map | std::views::values) {
+            o_file << "," << averages[i]; // averages.length == dates.length
+        }
+        o_file << std::endl;
     }
 
-    ofile.close();
+    o_file.close();
 }
 
 int main(int argc, char const *argv[]) {
@@ -66,8 +77,8 @@ int main(int argc, char const *argv[]) {
     options.add_options()
        ("i,input", "Input CSV file", cxxopts::value<std::string>())
        ("o,output", "Output CSV file", cxxopts::value<std::string>()->default_value("10_day_sma.csv"))
-       ("t,type", "Moving average type", cxxopts::value<std::string>()->default_value("SMA"))
-       ("w,window", "Window size", cxxopts::value<int>()->default_value("10"))
+       ("t,type", "Moving average type(sma, ema, etc.)", cxxopts::value<std::vector<std::string>>()->default_value({"sma"}))
+       ("w,window", "Window size", cxxopts::value<std::vector<int>>()->default_value({10}))
        ("h,help", "Print help");
 
     const cxxopts::ParseResult result = options.parse(argc, argv);
@@ -79,8 +90,13 @@ int main(int argc, char const *argv[]) {
 
     const std::string input = result["input"].as<std::string>();
     const std::string output = result["output"].as<std::string>();
-    const std::string type = result["type"].as<std::string>();
-    const int window = result["window"].as<int>();
+    const std::vector<std::string> types = result["type"].as<std::vector<std::string>>();
+    const std::vector<int> windows = result["window"].as<std::vector<int>>();
+
+    if (types.size() != windows.size()) {
+        std::cerr << "Error: The number of --type and --window arguments must match." << std::endl;
+        return 1;
+    }
 
     std::vector<OhlcData> ohlc_data;
     try {
@@ -89,19 +105,30 @@ int main(int argc, char const *argv[]) {
         std::cout << e.what() << std::endl;
     }
 
-    std::unique_ptr<MovingAverage> moving_average;
-    if (type == "SMA") {
-        moving_average = std::make_unique<SimpleMovingAverage>();
-    } else if (type == "EMA") {
-        moving_average = std::make_unique<ExponentialMovingAverage>();
-    } else {
-        std::cerr << "Unknown moving average type: " << type << std::endl;
-        return 1;
+    std::vector<std::string> dates;
+    std::vector<double> close_prices;
+    for (const OhlcData& ohlc_entry: ohlc_data) {
+        dates.push_back(ohlc_entry.date);
+        close_prices.push_back(ohlc_entry.close);
     }
 
-    const std::map<std::string, double> ma_map = moving_average -> calculate(ohlc_data, window);
+    std::map<std::string, std::vector<double>> ma_map;
+    for (int i = 0; i < types.size(); i++) {
+        std::unique_ptr<MovingAverage> moving_average;
+        if (types[i] == "sma") {
+            moving_average = std::make_unique<SimpleMovingAverage>();
+        } else if (types[i] == "ema") {
+            moving_average = std::make_unique<ExponentialMovingAverage>();
+        } else {
+            std::cerr << "Unknown moving average type: " << types[i] << std::endl;
+            return 1;
+        }
 
-    write_csv(ma_map, output, type, window);
+        std::string ma_label = types[i] + "_" + std::to_string(windows[i]);
+        ma_map[ma_label] = moving_average -> calculate(close_prices, windows[i]);
+    }
+
+    write_csv(dates, ma_map, output);
 
     return 0;
 }

@@ -11,6 +11,6 @@ public:
     ExponentialMovingAverage() = default;
 
     [[nodiscard]]
-    std::map<std::string, double> calculate(const std::vector<OhlcData> &ohlc_data, const int &window) const override;
+    std::vector<double> calculate(const std::vector<double>& prices, const int &window) const override;
 };
 #endif //EXPONENTIAL_MOVING_AVERAGE_H
