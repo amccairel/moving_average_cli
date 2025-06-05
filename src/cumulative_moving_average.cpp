@@ -4,12 +4,13 @@
 
 #include "../include/cumulative_moving_average.h"
 
-std::map<std::string, double> CumulativeMovingAverage::calculate(const std::vector<OhlcData> &ohlc_data, const int &window) const {
-    std::map<std::string, double> average_map;
+std::vector<double> CumulativeMovingAverage::calculate(const std::vector<double>& prices, const int& window) const {
+    std::vector<double> averages;
 
-    for (int i = 0; i < ohlc_data.size(); ++i) {
+    double sum = 0;
+    for (int i = 0; i < prices.size(); i++) {
         
     }
 
-    return average_map;
+    return averages;
 }
