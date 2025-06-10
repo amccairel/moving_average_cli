@@ -10,7 +10,7 @@ A high-performance command-line application written in C++ for processing histor
 - 📈 **Supports Multiple Moving Averages**:
     - Simple Moving Average (SMA)
     - Exponential Moving Average (EMA)
-    - Weighted Moving Average (EMA)
+    - Weighted Moving Average (WMA)
     - Additional indicators in progress 
 - 🗃️ **Clean CSV I/O**: Read and write stock data in standard CSV format for easy interoperability.
 - 🧠 **Extensible Design**: Add new technical indicators with minimal changes to core logic.
