@@ -10,6 +10,7 @@ A high-performance command-line application written in C++ for processing histor
 - 📈 **Supports Multiple Moving Averages**:
     - Simple Moving Average (SMA)
     - Exponential Moving Average (EMA)
+    - Weighted Moving Average (EMA)
     - Additional indicators in progress 
 - 🗃️ **Clean CSV I/O**: Read and write stock data in standard CSV format for easy interoperability.
 - 🧠 **Extensible Design**: Add new technical indicators with minimal changes to core logic.
@@ -36,7 +37,11 @@ make
 ### Run the CLI tool:
 
 ```bash
-./moving_average_cli --input path/to/stock-history.csv --output path/to/output.csv --type ema --window 12
+./moving_average_cli --input path/to/stock-history.csv --output path/to/output.csv --type ema --window 12 --type ema --window 26
+```
+Or you can use shorthand notation:
+```bash
+./moving_average_cli -i path/to/stock-history.csv -o path/to/output.csv -t ema -w 12 -t ema -w 26 -t sma -w 10 -t sma -w 20
 ```
 
 ### Example Input (CSV)

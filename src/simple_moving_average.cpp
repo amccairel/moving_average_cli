@@ -1,7 +1,7 @@
 //
 // Created by Alexander McCairel on 5/18/25.
 //
-#include "../include/simple_moving_average.h"
+#include "simple_moving_average.h"
 
 std::vector<double> SimpleMovingAverage::calculate(const std::vector<double>& prices, const int& window) const {
     std::vector<double> averages;

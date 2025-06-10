@@ -6,9 +6,10 @@
 #include <ranges>
 
 #include "exponential_moving_average.h"
-#include "../include/cxxopts.hpp"
-#include "../include/ohlc_data.h"
-#include "../include/simple_moving_average.h"
+#include "cxxopts.hpp"
+#include "ohlc_data.h"
+#include "simple_moving_average.h"
+#include "weighted_moving_average.h"
 
 // TODO: make reader writer
 std::vector<OhlcData> read_csv(const std::string& filename) {
@@ -48,7 +49,7 @@ std::vector<OhlcData> read_csv(const std::string& filename) {
     return ohlc_data;
 };
 
-void write_csv(const std::vector<std::string>& dates, const std::map<std::string, std::vector<double>>& ma_map, const std::string& filename) {
+void write_ma_csv(const std::vector<std::string>& dates, const std::map<std::string, std::vector<double>>& ma_map, const std::string& filename) {
     std::ofstream o_file(filename);
     if (!o_file.is_open()) {
         throw std::runtime_error("Error writing to file: " + filename);
@@ -119,6 +120,8 @@ int main(int argc, char const *argv[]) {
             moving_average = std::make_unique<SimpleMovingAverage>();
         } else if (types[i] == "ema") {
             moving_average = std::make_unique<ExponentialMovingAverage>();
+        } else if (types[i] == "wma") {
+            moving_average = std::make_unique<WeightedMovingAverage>();
         } else {
             std::cerr << "Unknown moving average type: " << types[i] << std::endl;
             return 1;
@@ -128,7 +131,7 @@ int main(int argc, char const *argv[]) {
         ma_map[ma_label] = moving_average -> calculate(close_prices, windows[i]);
     }
 
-    write_csv(dates, ma_map, output);
+    write_ma_csv(dates, ma_map, output);
 
     return 0;
 }
